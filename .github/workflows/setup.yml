@@ -1,0 +1,59 @@
+name: Execute template to populate repository
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  setup-repo:
+    if: ${{ github.repository != 'GuusdeWit/ret-plugin-template-repository' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Install cookiecutter
+        run: pip3 install cookiecutter
+
+      - uses: actions/github-script@v4
+        id: fetch-repo-and-user-details
+        with:
+          script: |
+            const query = `query($owner:String!, $name:String!) {
+              repository {
+                name
+                description
+              }
+            }`;
+            const result = await github.graphql(query)
+            console.log(result)
+            return result
+
+      - name: Rebuild contents using cookiecutter
+        env:
+          INFO: ${{ steps.fetch-repo-and-user-details.outputs.result }}
+        run: |
+          export REPO_NAME=$(echo $INFO | jq -r '.repository.name')
+          # Run cookiecutter
+          pushd /tmp
+          cookiecutter gh:GuusdeWit/cookiecutter-ret-plugin-kotlin-maven --no-input \
+            pluginName=$(echo $INFO | jq -r .repository.name) \
+            description="$(echo $INFO | jq -r .repository.description)"
+          popd
+          # Move generated content to root directory of repo
+          mv /tmp/$REPO_NAME/* .
+          # And .gitignore too:
+          mv /tmp/$REPO_NAME/.gitignore .
+          # Delete the setup.yml workflow, it has served its purpose
+          rm .github/workflows/setup.yml
+
+      - name: Force push new repo contents
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Initial plugin structure"
+          push_options: --force
