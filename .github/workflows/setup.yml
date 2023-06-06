@@ -28,9 +28,18 @@ jobs:
               repository {
                 name
                 description
+                owner {
+                  login
+                  ... on User {
+                    name
+                  }
+                  ... on Organization {
+                    name
+                  }
+                }
               }
             }`;
-              const variables = {
+            const variables = {
               owner: context.repo.owner,
               name: context.repo.repo
             }
