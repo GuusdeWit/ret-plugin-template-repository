@@ -8,7 +8,7 @@ Simply click on "Use this template" and fill in a repository name and descriptio
 After clicking the create button, you will have a new repository that looks very similar to this one. 
 If you are reading this in your own newly created repo: congrats! Your scaffolded plugin will appear in a minute or so (after a refresh). In the meantime, enjoy this waiting music:
 
-![](https://github.com/GuusdeWit/ret-plugin-template-repository/waiting.gif)
+![](https://github.com/GuusdeWit/ret-plugin-template-repository/blob/main/waiting.gif)
 
 ## Credits
 
