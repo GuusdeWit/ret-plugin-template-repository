@@ -55,7 +55,7 @@ jobs:
           # Run cookiecutter
           pushd /tmp
           cookiecutter gh:GuusdeWit/cookiecutter-ret-plugin-kotlin-maven --no-input \
-            plugin_name=$(echo $INFO | jq -r '.repository.name | sub("ret-"; "")') \
+            pluginName=$(echo $INFO | jq -r .repository.name) \
             description="$(echo $INFO | jq -r .repository.description)"
           popd
           # Move generated content to root directory of repo
